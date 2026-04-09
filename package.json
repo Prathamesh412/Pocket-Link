@@ -1,0 +1,40 @@
+{
+  "name": "web-links",
+  "version": "1.0.0",
+  "description": "A full-stack PWA for managing and organizing web links",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "tailwindcss -i ./src/input.css -o ./public/styles.css",
+    "watch": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch"
+  },
+  "keywords": [
+    "pwa",
+    "links",
+    "bookmarks",
+    "bucket"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "metascraper": "^5.38.0",
+    "metascraper-description": "^5.38.0",
+    "metascraper-image": "^5.38.0",
+    "metascraper-title": "^5.38.0",
+    "metascraper-url": "^5.38.0",
+    "mongoose": "^7.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "tailwindcss": "^3.3.0"
+  }
+}

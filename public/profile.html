@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e293b">
+  <title>Profile - Web Links</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { @apply box-border; }
+    html, body { @apply bg-gray-50 text-slate-900; }
+    body.dark-mode { @apply bg-slate-900 text-gray-50; }
+    input, textarea, select { @apply border border-gray-300 rounded px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent; }
+    body.dark-mode input, body.dark-mode textarea, body.dark-mode select { @apply bg-slate-800 text-gray-50 border-slate-700; }
+    .btn-primary { @apply px-4 py-2 rounded font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors cursor-pointer; }
+    .btn-secondary { @apply px-4 py-2 rounded font-medium bg-gray-200 text-slate-900 hover:bg-gray-300 transition-colors cursor-pointer; }
+    body.dark-mode .btn-secondary { @apply bg-slate-700 text-gray-50 hover:bg-slate-600; }
+    .card { @apply bg-white rounded-lg shadow; }
+    body.dark-mode .card { @apply bg-slate-800 shadow-lg; }
+    .tab-button { @apply px-4 py-2 rounded-t font-medium cursor-pointer transition-colors; }
+    .tab-button.active { @apply bg-blue-600 text-white; }
+  </style>
+</head>
+<body class="font-sans">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="card shadow-md">
+      <div class="container mx-auto max-w-4xl px-4 py-4 flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold">🔗 Web Links</a>
+        <button id="logoutBtn" class="btn-secondary">Log Out</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto max-w-4xl px-4 py-8">
+      <!-- Tabs -->
+      <div class="flex gap-4 mb-6 border-b border-gray-200">
+        <button class="tab-button active" onclick="switchTab('profile')">👤 Profile</button>
+        <button class="tab-button" onclick="switchTab('password')">🔐 Password</button>
+        <button class="tab-button" onclick="switchTab('settings')">⚙️ Settings</button>
+        <button class="tab-button" onclick="switchTab('danger')">⚠️ Danger Zone</button>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="profileTab" class="tab-content card p-6">
+        <h2 class="text-2xl font-bold mb-6">Edit Profile</h2>
+        <form id="profileForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Full Name</label>
+            <input type="text" id="name" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Email</label>
+            <input type="email" id="email" disabled class="bg-gray-100 text-gray-500 cursor-not-allowed">
+            <p class="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Bio</label>
+            <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+          </div>
+
+          <div class="flex gap-2">
+            <button type="submit" class="btn-primary">💾 Save Changes</button>
+            <button type="button" class="btn-secondary" onclick="location.href='/'">Cancel</button>
+          </div>
+          <div id="profileError" class="hidden p-3 bg-red-50 text-red-700 rounded text-sm"></div>
+          <div id="profileSuccess" class="hidden p-3 bg-green-50 text-green-700 rounded text-sm">✅ Profile updated successfully</div>
+        </form>
+      </div>
+
+      <!-- Password Tab -->
+      <div id="passwordTab" class="tab-content hidden card p-6">
+        <h2 class="text-2xl font-bold mb-6">Change Password</h2>
+        <form id="passwordForm" class="space-y-4 max-w-md">
+          <div>
+            <label class="block text-sm font-medium mb-2">Current Password</label>
+            <input type="password" id="currentPassword" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">New Password</label>
+            <input type="password" id="newPassword" required minlength="6">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Confirm Password</label>
+            <input type="password" id="confirmPassword" required minlength="6">
+          </div>
+
+          <div class="flex gap-2">
+            <button type="submit" class="btn-primary">🔐 Update Password</button>
+          </div>
+          <div id="passwordError" class="hidden p-3 bg-red-50 text-red-700 rounded text-sm"></div>
+          <div id="passwordSuccess" class="hidden p-3 bg-green-50 text-green-700 rounded text-sm">✅ Password updated successfully</div>
+        </form>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="settingsTab" class="tab-content hidden card p-6">
+        <h2 class="text-2xl font-bold mb-6">Settings</h2>
+        <form id="settingsForm" class="space-y-4 max-w-md">
+          <div>
+            <label class="block text-sm font-medium mb-2">UI Theme</label>
+            <div class="flex gap-4">
+              <label class="flex items-center cursor-pointer">
+                <input type="radio" name="theme" value="light" class="mr-2">
+                <span>☀️ Light</span>
+              </label>
+              <label class="flex items-center cursor-pointer">
+                <input type="radio" name="theme" value="dark" class="mr-2">
+                <span>🌙 Dark</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button type="submit" class="btn-primary">💾 Save Settings</button>
+          </div>
+          <div id="settingsError" class="hidden p-3 bg-red-50 text-red-700 rounded text-sm"></div>
+          <div id="settingsSuccess" class="hidden p-3 bg-green-50 text-green-700 rounded text-sm">✅ Settings updated</div>
+        </form>
+      </div>
+
+      <!-- Danger Zone Tab -->
+      <div id="dangerTab" class="tab-content hidden card p-6 bg-red-50">
+        <h2 class="text-2xl font-bold mb-6 text-red-900">Danger Zone</h2>
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-bold text-red-900">Delete Account</h3>
+            <p class="text-sm text-red-700 mb-4">This action cannot be undone. All your links will be permanently deleted.</p>
+            <button type="button" id="deleteBtn" class="px-4 py-2 rounded font-medium bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer">
+              Delete My Account
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Check auth on load
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+    }
+
+    // Load user profile
+    async function loadProfile() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/user/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load profile');
+
+        const user = await response.json();
+        document.getElementById('name').value = user.name;
+        document.getElementById('email').value = user.email;
+        document.getElementById('bio').value = user.bio || '';
+        document.querySelector(`input[name="theme"][value="${user.theme}"]`).checked = true;
+
+        // Apply theme if needed
+        if (user.theme === 'dark') {
+          document.body.classList.add('dark-mode');
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    // Switch tabs
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(tabName + 'Tab').classList.remove('hidden');
+      
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // Profile form
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorDiv = document.getElementById('profileError');
+      const successDiv = document.getElementById('profileSuccess');
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/user/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: document.getElementById('name').value,
+            bio: document.getElementById('bio').value
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to update profile');
+        successDiv.classList.remove('hidden');
+      } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.classList.remove('hidden');
+      }
+    });
+
+    // Password form
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorDiv = document.getElementById('passwordError');
+      const successDiv = document.getElementById('passwordSuccess');
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/user/password', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            currentPassword: document.getElementById('currentPassword').value,
+            newPassword: document.getElementById('newPassword').value,
+            confirmPassword: document.getElementById('confirmPassword').value
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to update password');
+        successDiv.classList.remove('hidden');
+        document.getElementById('passwordForm').reset();
+      } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.classList.remove('hidden');
+      }
+    });
+
+    // Settings form
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorDiv = document.getElementById('settingsError');
+      const successDiv = document.getElementById('settingsSuccess');
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+
+      try {
+        const token = localStorage.getItem('token');
+        const theme = document.querySelector('input[name="theme"]:checked').value;
+        
+        const response = await fetch('/api/user/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ theme })
+        });
+
+        if (!response.ok) throw new Error('Failed to update settings');
+        successDiv.classList.remove('hidden');
+
+        // Apply theme
+        if (theme === 'dark') {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+        }
+      } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.classList.remove('hidden');
+      }
+    });
+
+    // Delete account
+    document.getElementById('deleteBtn').addEventListener('click', async () => {
+      const password = prompt('Enter your password to confirm account deletion:');
+      if (!password) return;
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/user/account', {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password })
+        });
+
+        if (!response.ok) throw new Error('Failed to delete account');
+        
+        alert('Account deleted successfully');
+        localStorage.clear();
+        window.location.href = '/login.html';
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = '/login.html';
+    });
+
+    // Initialize
+    checkAuth();
+    loadProfile();
+  </script>
+</body>
+</html>

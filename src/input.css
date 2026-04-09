@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply box-border; }
+  html, body { @apply bg-gray-50 text-slate-900; height: 100%; }
+  body.dark-mode { @apply bg-slate-900 text-gray-50; }
+  
+  input, textarea, select {
+    @apply border border-gray-300 rounded px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+  body.dark-mode input, body.dark-mode textarea, body.dark-mode select {
+    @apply bg-slate-800 text-gray-50 border-slate-700 focus:ring-blue-400;
+  }
+  
+  input::placeholder, textarea::placeholder {
+    @apply text-gray-400;
+  }
+  body.dark-mode input::placeholder, body.dark-mode textarea::placeholder {
+    @apply text-gray-500;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg shadow hover:shadow-lg transition-shadow;
+  }
+  body.dark-mode .card { @apply bg-slate-800 shadow-lg; }
+
+  .btn-primary {
+    @apply px-4 py-2 rounded font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded font-medium bg-gray-200 text-slate-900 hover:bg-gray-300 transition-colors cursor-pointer;
+  }
+  body.dark-mode .btn-secondary { @apply bg-slate-700 text-gray-50 hover:bg-slate-600; }
+
+  .btn-icon {
+    @apply w-10 h-10 flex items-center justify-center rounded hover:bg-gray-200 transition-colors cursor-pointer;
+  }
+  body.dark-mode .btn-icon { @apply hover:bg-slate-700; }
+
+  .sidebar { @apply lg:sticky lg:top-0 h-screen lg:overflow-y-auto overflow-x-auto bg-white; }
+  body.dark-mode .sidebar { @apply bg-slate-800; }
+
+  .bucket-btn { @apply block w-full text-left px-4 py-3 rounded-lg transition-colors hover:bg-gray-200 cursor-pointer; }
+  body.dark-mode .bucket-btn { @apply hover:bg-slate-700; }
+  .bucket-btn.active { @apply bg-blue-600 text-white; }
+
+  .card-image { @apply w-full h-40 object-cover rounded-t-lg; }
+
+  .tag { @apply inline-block px-2 py-1 text-xs rounded-full bg-gray-200 text-slate-900 hover:bg-gray-300 transition-colors cursor-pointer mr-2 mb-2; }
+  body.dark-mode .tag { @apply bg-slate-700 text-gray-50 hover:bg-slate-600; }
+  .tag.active { @apply bg-blue-600 text-white; }
+
+  .masthead { @apply bg-white shadow sticky top-0 z-40; }
+  body.dark-mode .masthead { @apply bg-slate-800 shadow-lg; }
+
+  .streaming-badge {
+    @apply absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium text-white;
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .suggested-tag {
+    @apply inline-block px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-900 cursor-pointer hover:bg-blue-200 transition-colors mr-2 mb-2;
+  }
+  body.dark-mode .suggested-tag {
+    @apply bg-blue-900 text-blue-100 hover:bg-blue-800;
+  }
+
+  .dropdown { position: relative; }
+  #userDropdown {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  body.dark-mode #userDropdown {
+    @apply bg-slate-700 text-gray-50;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  }
+  body.dark-mode #userDropdown a:hover,
+  body.dark-mode #userDropdown button:hover {
+    @apply bg-slate-600;
+  }
+
+  #linkModal > div, #moveBucketModal > div {
+    @apply bg-white;
+  }
+  body.dark-mode #linkModal > div,
+  body.dark-mode #moveBucketModal > div {
+    @apply bg-slate-800;
+  }
+
+  #suggestedTagsContainer {
+    @apply bg-blue-50;
+  }
+  body.dark-mode #suggestedTagsContainer {
+    @apply bg-blue-900;
+  }
+
+  #suggestedTagsContainer p {
+    @apply text-blue-900;
+  }
+  body.dark-mode #suggestedTagsContainer p {
+    @apply text-blue-100;
+  }
+
+  #selectedTagsContainer {
+    @apply bg-gray-50;
+  }
+  body.dark-mode #selectedTagsContainer {
+    @apply bg-slate-700;
+  }
+}
+
+@layer utilities {
+  .masonry { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+  @media (max-width: 768px) { .masonry { grid-template-columns: 1fr; } }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .fade-in { animation: fadeIn 0.3s ease-in; }
+
+  .loading-spinner {
+    border: 3px solid #d1d5db;
+    border-top: 3px solid #2563eb;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+  }
+  body.dark-mode .loading-spinner {
+    border: 3px solid #334155;
+    border-top: 3px solid #60a5fa;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .overflow-hidden { overflow: hidden; }
+}

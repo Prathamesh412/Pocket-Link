@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Save - Web Links</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { @apply bg-gray-50 text-slate-900; }
+    input, textarea, select { @apply border border-gray-300 rounded px-3 py-2 w-full; }
+    button { @apply px-4 py-2 rounded font-medium transition-colors; }
+    .btn-primary { @apply bg-blue-600 text-white hover:bg-blue-700; }
+    .btn-secondary { @apply bg-gray-200 text-slate-900 hover:bg-gray-300; }
+  </style>
+</head>
+<body class="font-sans">
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+      <h1 class="text-2xl font-bold mb-4 text-slate-900">Quick Save Link</h1>
+      
+      <% if (image) { %>
+        <img src="<%= image %>" alt="<%= title %>" class="w-full h-40 object-cover rounded mb-4">
+      <% } %>
+
+      <form id="quickSaveForm">
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Title</label>
+          <input type="text" name="title" value="<%= title %>" class="!w-full" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Description</label>
+          <textarea name="description" rows="3" class="!w-full"><%= description %></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Bucket</label>
+          <select name="bucket" class="!w-full">
+            <option value="Inbox">📮 Inbox</option>
+            <option value="Watchlist">👁️ Watchlist</option>
+            <option value="Kitchen">👨‍🍳 Kitchen</option>
+            <option value="Reading">📖 Reading</option>
+            <option value="Reference">📚 Reference</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Tags (comma-separated)</label>
+          <input type="text" name="tags" placeholder="e.g., tech, tutorial, important" class="!w-full">
+        </div>
+
+        <input type="hidden" name="url" value="<%= url %>">
+
+        <% if (readingTime > 0) { %>
+          <div class="mb-4 p-3 bg-blue-50 rounded text-sm">
+            ⏱️ Estimated reading time: <strong><%= readingTime %> min</strong>
+          </div>
+        <% } %>
+
+        <% if (streamingService) { %>
+          <div class="mb-4 p-3 bg-purple-50 rounded text-sm">
+            🎬 Detected: <strong><%= streamingService %></strong>
+          </div>
+        <% } %>
+
+        <div class="flex gap-2">
+          <button type="submit" class="btn-primary flex-1">💾 Save Link</button>
+          <button type="button" class="btn-secondary flex-1" onclick="window.close()">Cancel</button>
+        </div>
+      </form>
+
+      <div id="successMessage" class="mt-4 p-3 bg-green-50 text-green-700 rounded hidden">
+        ✅ Link saved successfully!
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('quickSaveForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const data = {
+        url: formData.get('url'),
+        title: formData.get('title'),
+        description: formData.get('description'),
+        bucket: formData.get('bucket'),
+        tags: formData.get('tags').split(',').map(t => t.trim()).filter(t => t),
+      };
+
+      try {
+        const response = await fetch('/api/share-target/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          document.getElementById('successMessage').classList.remove('hidden');
+          setTimeout(() => window.close(), 2000);
+        } else {
+          alert('Failed to save link');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving link');
+      }
+    });
+  </script>
+</body>
+</html>

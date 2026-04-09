@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1e293b">
+  <meta name="description" content="Organize and manage your web links with AI-powered bookmarks">
+  
+  <title>Web Links - Organize Your Bookmarks</title>
+  
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e293b' width='100' height='100'/><text x='50' y='50' dominant-baseline='middle' text-anchor='middle' font-size='60' fill='%23f1f5f9' font-weight='bold'>W</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%231e293b' width='180' height='180'/><text x='90' y='90' dominant-baseline='middle' text-anchor='middle' font-size='100' fill='%23f1f5f9' font-weight='bold'>W</text></svg>">
+</head>
+<body class="overflow-hidden">
+  <!-- Main Container -->
+  <div class="flex flex-col lg:flex-row h-screen">
+    
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-full lg:w-64 sidebar hidden lg:flex flex-col border-r border-gray-200">
+      <!-- Logo -->
+      <div class="p-6 border-b border-gray-200">
+        <h1 class="text-2xl font-bold">🔗 Web Links</h1>
+        <p class="text-sm text-gray-600 mt-1">Organize your bookmarks</p>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="p-4 border-b border-gray-200">
+        <button id="addLinkBtn" class="btn-primary w-full mb-2">+ Add Link</button>
+        <div class="flex gap-2">
+          <button id="selectModeBtn" class="btn-secondary flex-1 text-sm">✓ Select</button>
+          <button id="searchToggleBtn" class="btn-secondary flex-1 text-sm">🔍 Search</button>
+        </div>
+      </div>
+
+      <!-- Buckets -->
+      <div class="p-4 border-b border-gray-200 flex-1 overflow-y-auto">
+        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">Buckets</h3>
+        <div id="bucketList" class="space-y-2"></div>
+      </div>
+
+      <!-- Tag Cloud -->
+      <div class="p-4 border-t border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto">
+        <div id="trendingLabel"></div>
+        <div id="tagCloud" class="flex flex-wrap gap-2"></div>
+      </div>
+    </aside>
+
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-50 btn-icon bg-white shadow">☰</button>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+      <!-- Top Bar -->
+      <div class="masthead px-4 py-4 lg:py-3 flex items-center justify-between gap-4 border-b border-gray-200">
+        <div class="flex-1">
+          <h2 id="pageTitle" class="text-xl lg:text-2xl font-bold">All Links</h2>
+          <p id="statsText" class="text-sm text-gray-600"></p>
+        </div>
+        
+        <div class="flex items-center gap-4">
+          <div id="selectionStats" class="text-sm text-gray-600 hidden">
+            <span id="selectedCount">0</span> selected
+          </div>
+          <div id="bulkActions" class="hidden flex gap-2">
+            <button id="moveBucketBtn" class="btn-secondary text-sm">Move</button>
+            <button id="deleteBtn" class="btn-secondary text-sm bg-red-200 hover:bg-red-300 text-red-900">Delete</button>
+          </div>
+
+          <!-- User Menu -->
+          <div class="flex items-center gap-2">
+            <button id="themeModeBtn" class="btn-icon" title="Toggle Dark Mode">🌙</button>
+            <div class="dropdown relative">
+              <button id="userMenuBtn" class="btn-icon" title="User Menu">👤</button>
+              <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10">
+                <div class="p-4 border-b border-gray-200">
+                  <p class="font-semibold text-sm" id="userName">User</p>
+                  <p class="text-xs text-gray-500" id="userEmail">email@example.com</p>
+                </div>
+                <a href="/profile.html" class="block px-4 py-2 hover:bg-gray-100 text-sm">⚙️ Profile</a>
+                <button id="logoutBtn" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600">🚪 Log Out</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Bar (Hidden by default on mobile) -->
+      <div id="searchBar" class="hidden lg:flex px-4 py-3 bg-white border-b border-gray-200 gap-2">
+        <input type="text" id="searchInput" placeholder="Search links, tags, or buckets..." class="flex-1">
+        <button id="clearSearchBtn" class="btn-secondary">Clear</button>
+      </div>
+
+      <!-- Links Grid -->
+      <div id="linksContainer" class="flex-1 overflow-y-auto p-4 lg:p-6">
+        <div id="linksList" class="masonry">
+          <!-- Links will be inserted here -->
+        </div>
+        <div id="emptyState" class="col-span-full flex flex-col items-center justify-center h-64">
+          <p class="text-3xl mb-2">📭</p>
+          <p class="text-slate-900 font-medium">No links found</p>
+          <p class="text-gray-600 text-sm">Add your first link to get started</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Link Detail View Modal -->
+  <div id="detailViewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full fade-in max-h-[80vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white dark:bg-slate-800 p-6 border-b border-gray-200 dark:border-gray-700 flex items-start justify-between">
+        <div class="flex-1 mr-4">
+          <h2 id="detailTitle" class="text-2xl font-bold text-slate-900 dark:text-gray-50 line-clamp-2 mb-1"></h2>
+          <p id="detailUrl" class="text-xs text-gray-500 dark:text-gray-400 break-all"></p>
+        </div>
+        <button onclick="closeDetailView()" class="text-2xl hover:opacity-60">✕</button>
+      </div>
+
+      <div class="p-6 space-y-6">
+        <!-- Your Notes Section -->
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+            <span>📝</span> Your Notes
+          </h3>
+          <textarea id="detailUserNotes" class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-sm dark:bg-slate-700 dark:text-gray-100" rows="2" placeholder="Add your personal notes..."></textarea>
+        </div>
+
+        <!-- AI Generated Description -->
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+            <span>🤖</span> AI Summary
+          </h3>
+          <p id="detailDescription" class="text-gray-700 dark:text-gray-300 leading-relaxed text-sm bg-blue-50 dark:bg-slate-700 p-3 rounded">
+            <span class="inline-block animate-pulse">Loading...</span>
+          </p>
+        </div>
+
+        <!-- User Tags Section -->
+        <div>
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+            <span>🏷️</span> Tags
+          </h3>
+          <div id="detailTags" class="flex flex-wrap gap-2 mb-3">
+            <span class="text-xs text-gray-500 dark:text-gray-400">No tags</span>
+          </div>
+          <input type="text" id="detailTagsInput" class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-sm dark:bg-slate-700 dark:text-gray-100" placeholder="Add tags (comma-separated)">
+        </div>
+
+        <!-- AI Generated Tags Section -->
+        <div id="aiTagsSection" class="hidden">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <span>🤖</span> Suggested Tags
+            </h3>
+            <button onclick="generateAITags()" class="text-xs btn-secondary">🔄 Regenerate</button>
+          </div>
+          <div id="detailAiTags" class="flex flex-wrap gap-2">
+            <span class="text-xs text-gray-500 dark:text-gray-400">No AI suggestions</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <a id="detailLinkBtn" href="#" target="_blank" class="flex-1 btn-primary text-center">🔗 Go to Page</a>
+          <button onclick="saveDetailChanges()" class="flex-1 btn-primary">💾 Save Changes</button>
+          <button onclick="closeDetailView()" class="flex-1 btn-secondary">✕ Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Link Modal -->
+  <div id="linkModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full fade-in max-h-96 overflow-y-auto">
+      <div class="p-6 border-b border-gray-200">
+        <h3 id="modalTitle" class="text-xl font-bold text-slate-900">Add New Link</h3>
+      </div>
+
+      <form id="linkForm" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">URL *</label>
+          <input type="url" id="linkUrl" placeholder="https://example.com" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Title</label>
+          <input type="text" id="linkTitle" placeholder="Leave empty to auto-fetch">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Description</label>
+          <textarea id="linkDescription" rows="2" placeholder="Optional notes..."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Bucket</label>
+          <select id="linkBucket">
+            <option value="Inbox">📮 Inbox</option>
+            <option value="Watchlist">👁️ Watchlist</option>
+            <option value="Kitchen">👨‍🍳 Kitchen</option>
+            <option value="Reading">📖 Reading</option>
+            <option value="Reference">📚 Reference</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-medium">Tags</label>
+            <button type="button" id="suggestTagsBtn" class="text-xs text-blue-600 hover:text-blue-700 font-medium">✨ Suggest</button>
+          </div>
+          
+          <!-- AI Suggestions -->
+          <div id="suggestedTagsContainer" class="hidden mb-3 p-3 bg-blue-50 rounded">
+            <p class="text-xs font-medium text-blue-900 mb-2">Suggested tags (click to add):</p>
+            <div id="suggestedTagsList"></div>
+          </div>
+
+          <!-- Manual input -->
+          <input type="text" id="linkTags" placeholder="Or type manually: comma-separated tags...">
+          
+          <!-- Selected tags -->
+          <div id="selectedTagsContainer" class="mt-2 p-2 bg-gray-50 rounded hidden">
+            <div id="selectedTagsList" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-4">
+          <button type="submit" class="btn-primary flex-1">💾 Save</button>
+          <button type="button" class="btn-secondary flex-1" onclick="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Move Bucket Modal -->
+  <div id="moveBucketModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-sm w-full fade-in">
+      <div class="p-6 border-b border-gray-200">
+        <h3 class="text-xl font-bold text-slate-900">Move to Bucket</h3>
+      </div>
+
+      <div class="p-6 space-y-2">
+        <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer" onclick="moveToAndClose('Inbox')">📮 Inbox</button>
+        <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer" onclick="moveToAndClose('Watchlist')">👁️ Watchlist</button>
+        <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer" onclick="moveToAndClose('Kitchen')">👨‍🍳 Kitchen</button>
+        <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer" onclick="moveToAndClose('Reading')">📖 Reading</button>
+        <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer" onclick="moveToAndClose('Reference')">📚 Reference</button>
+      </div>
+
+      <div class="p-6 border-t border-gray-200 flex gap-2">
+        <button class="btn-secondary flex-1" onclick="document.getElementById('moveBucketModal').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-3 rounded shadow-lg z-40 fade-in max-w-xs"></div>
+
+  <!-- Scripts -->
+  <script src="/js/main.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    // Check authentication
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // Load user info
+    async function loadUserInfo() {
+      try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        document.getElementById('userName').textContent = user.name || 'User';
+        document.getElementById('userEmail').textContent = user.email || 'email@example.com';
+
+        // Apply saved theme
+        if (user.theme === 'dark') {
+          document.body.classList.add('dark-mode');
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    // Toggle dark mode
+    const themBtn = document.getElementById('themeModeBtn');
+    if (themBtn) {
+      themBtn.addEventListener('click', async () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch('/api/user/profile', {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ theme: isDark ? 'dark' : 'light' })
+          });
+
+          // Update localStorage
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          user.theme = isDark ? 'dark' : 'light';
+          localStorage.setItem('user', JSON.stringify(user));
+          
+          console.log('Theme updated to:', isDark ? 'dark' : 'light');
+        } catch (error) {
+          console.error('Error updating theme:', error);
+        }
+      });
+    } else {
+      console.warn('Theme mode button not found');
+    }
+
+    // User menu toggle
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    if (userMenuBtn) {
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('hidden');
+        }
+      });
+    }
+
+    document.addEventListener('click', () => {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = '/login.html';
+      });
+    }
+
+    // Suggest tags with AI
+    document.getElementById('suggestTagsBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('linkTitle').value;
+      const description = document.getElementById('linkDescription').value;
+      const url = document.getElementById('linkUrl').value;
+
+      if (!title && !description) {
+        showToast('❌ Enter title or description first');
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/ai/generate-tags', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ title, description, url })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.tags && data.tags.length > 0) {
+          // Display suggested tags
+          const suggestedList = document.getElementById('suggestedTagsList');
+          suggestedList.innerHTML = data.tags.map(tag =>
+            `<span class="suggested-tag" onclick="addSuggestedTag('${tag}')">${tag}</span>`
+          ).join('');
+
+          document.getElementById('suggestedTagsContainer').classList.remove('hidden');
+          showToast('✨ Tags suggested! Click to add them.');
+        } else {
+          showToast('⚠️ Could not generate tags. Try adding them manually.');
+        }
+      } catch (error) {
+        console.error('Error generating tags:', error);
+        showToast('❌ Failed to generate tags');
+      }
+    });
+
+    // Add suggested tag
+    function addSuggestedTag(tag) {
+      const currentTags = document.getElementById('linkTags').value
+        .split(',')
+        .map(t => t.trim())
+        .filter(t => t);
+
+      if (!currentTags.includes(tag)) {
+        currentTags.push(tag);
+        document.getElementById('linkTags').value = currentTags.join(', ');
+      }
+    }
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(() => {
+        console.log('Service Worker registration failed');
+      });
+    }
+
+    // Initialize
+    if (checkAuth()) {
+      loadUserInfo();
+      initApp();
+    }
+  </script>
+</body>
+</html>

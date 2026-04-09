@@ -445,9 +445,6 @@ Contributions are welcome! Please follow these steps:
 
 This project is licensed under the ISC License - see the LICENSE file for details.
 
-## 👤 Author
-
-Created with ❤️ by [Your Name](https://github.com/your-username)
 
 ## 💬 Support
 

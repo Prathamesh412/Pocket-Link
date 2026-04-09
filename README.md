@@ -1,4 +1,4 @@
-# 🔗 BucketLink - AI-Powered Link Management PWA
+# 🔗 PocketLink - AI-Powered Link Management PWA
 
 A full-stack Progressive Web Application (PWA) for organizing, managing, and discovering web links with AI-powered features including automatic tag generation, link descriptions, and semantic content analysis.
 
@@ -83,8 +83,8 @@ Before you begin, ensure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/bucketlink.git
-cd bucketlink
+git clone
+cd into Directory
 ```
 
 ### 2. Install Dependencies
@@ -241,7 +241,7 @@ vercel
 ## 📁 Project Structure
 
 ```
-bucketlink/
+pocketlink/
 ├── public/                          # Static frontend files
 │   ├── index.html                   # Main app page
 │   ├── login.html                   # Login page
